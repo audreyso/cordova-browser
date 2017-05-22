@@ -38,7 +38,6 @@ describe('can get the Api', function() {
         expect(promise).toBeDefined();
         expect(promise.then).toBeDefined();
         promise.then(function(res) {
-            console.log('result = ' + res);
             shell.rm('-rf', tmpDir);
             done();
         },

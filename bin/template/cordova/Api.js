@@ -65,11 +65,6 @@ function Api(platform, platformRootDir, events) {
 }
 
 Api.createPlatform = function (dest, config, options, events) {
-    // console.log("=======================");
-    // console.log("browser createPlatform !! dest:" + dest);
-    // console.log("config=",config);
-    // console.log("options=",options);
-    // console.log("events="+events);
 
     events = setupEvents(events);
     var name = "HelloCordova";
@@ -82,7 +77,6 @@ Api.createPlatform = function (dest, config, options, events) {
     try {
 
         var creator = require('../../lib/create');
-        // console.log("creator = " + creator);
         result = creator.createProject(dest, id, name, options)
         .then(function () {
             // after platform is created we return Api instance based on new Api.js location
@@ -96,18 +90,50 @@ Api.createPlatform = function (dest, config, options, events) {
         events.emit('error','createPlatform is not callable from the browser project API.');
         throw(e);
     }
+
+    // Create manifest.json
+    var manifestJson;
+    var manifestJsonPath = path.join(dest,'manifest.json');
+
+    // Check if path exists and require manifestJsonPath.
+    if(fs.existsSync(manifestJsonPath)) {
+        try {
+            manifestJson = require(manifestJsonPath);
+        } 
+        catch (e) {
+            console.log("error : " + e);
+            events.emit('error', 'unable to require manifest.json path.');
+        }
+    } else if (manifestJson === undefined) {
+        manifestJson = {};
+        if(config){
+            if(config.name()) {
+                manifestJson.name = config.name();
+            }
+            if(config.packageName()) {
+                manifestJson.version = config.packageName();
+            }
+            if(config.description()) {
+                manifestJson.description = config.description();
+            }
+
+            if(config.author()) {
+                manifestJson.author = config.author();
+            }
+        }
+    }
+    fs.writeFileSync(manifestJsonPath, JSON.stringify(manifestJson, null, 4), 'utf8');
+
     return result;
 };
 
 
 Api.updatePlatform = function (dest, options, events) {
-    // console.log("test-platform:Api:updatePlatform");
     // todo?: create projectInstance and fulfill promise with it.
     return Promise.resolve();
 };
 
 Api.prototype.getPlatformInfo = function () {
-    // console.log("browser-platform:Api:getPlatformInfo");
     // return PlatformInfo object
     return {
         "locations":this.locations,
@@ -165,7 +191,6 @@ Api.prototype.prepare = function (cordovaProject,options) {
 
 Api.prototype.addPlugin = function (pluginInfo, installOptions) {
 
-    // console.log(new Error().stack);
     if (!pluginInfo) {
         return Promise.reject('The parameter is incorrect. The first parameter ' +
             'should be valid PluginInfo instance');
@@ -220,7 +245,6 @@ Api.prototype.addPlugin = function (pluginInfo, installOptions) {
 };
 
 Api.prototype.removePlugin = function (plugin, uninstallOptions) {
-    //console.log("NotImplemented :: browser-platform:Api:removePlugin ",plugin, uninstallOptions);
 
     uninstallOptions = uninstallOptions || {};
     // CB-10108 platformVersion option is required for proper plugin installation

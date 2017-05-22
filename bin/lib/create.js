@@ -28,10 +28,6 @@ var fs = require('fs'),
 
 module.exports.createProject = function(project_path,package_name,project_name){
 
-    console.log("ROOT = " + ROOT);
-    console.log("browser :: createProject",project_path,package_name,project_name);
-
-
 /*
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
